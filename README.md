@@ -2,8 +2,6 @@
 
 This project presents a comprehensive analysis of utilizing the *distcc* tool for distributed compilation on macOS.
 
-In summary, while distcc operates effectively with command-line build systems such as Makefiles and Ninja, it is not compatible with Xcode as of today. Further details on this limitation are provided later in the documentation.
-
 ## Installation
 
 A minimum of two Mac machines is required for this experiment. Ensure that the following tools are installed on each machine.
@@ -102,23 +100,23 @@ make
 
 ### Xcode
 
-As highlighted earlier, distcc and Xcode are currently incompatible. This issue has been formally reported on distcc's GitHub repository, under [Issue #251](https://github.com/distcc/distcc/issues/251). While a patch has been proposed as a potential solution, it has not yet been officially implemented by the distcc development team. For those interested, the proposed patch can be found [here](https://github.com/PSPDFKit-labs/distcc/commit/5e4350d7e4e8a7667ce88f2bfb68250b91c004e9).
+The compatibility issue between distcc and Xcode, discussed under [Issue #492](https://github.com/distcc/distcc/issues/492) in the distcc GitHub repository, has been resolved in this project.
 
-We're keeping the Xcode project setup in this project on purpose. That way, if the distcc team ever fixes the compatibility issue with Xcode, we can quickly test it out and maybe even start using it.
+To address the incompatibility, we have modified our Xcode project setup by disabling the **Enable Index-While-Building Functionality** feature, which was known to conflict with distcc's operations. The following setting in the project's CMake configuration prevents Xcode from utilizing the `-index-store-path` compiler flag:
 
-To reproduce the error, run the `generateXcode.sh` script. This will generate an Xcode project in the `_build/Xcode` directory and automatically launch Xcode with the generated project.
+```
+set(CMAKE_XCODE_ATTRIBUTE_COMPILER_INDEX_STORE_ENABLE NO)
+```
+
+This flag was identified as the root cause of build failures when using distcc. With this adjustment, Xcode and distcc can now be used together seamlessly.
+
+To set up and launch the Xcode project, run the `generateXcode.sh` script. This script generates an Xcode project in the `_build/Xcode` directory and automatically opens it in Xcode:
 
 ```
 ./generateXcode.sh
 ```
 
-When you build, Xcode will give the following error.
-
-```
-Command CompileC failed with a nonzero exit code
-```
+Once the Xcode project opens, proceed with building as you would typically. Press the **Run** button or use the `Cmd+B` shortcut to start the build process. distcc will now collaborate with Xcode to compile your project efficiently.
 
 ## References
 - https://www.distcc.org/
-- https://pspdfkit.com/blog/2017/crazy-fast-builds-using-distcc/
-- https://github.com/distcc/distcc/issues/251

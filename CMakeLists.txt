@@ -24,6 +24,10 @@ if (APPLE)
 		if (CMAKE_GENERATOR STREQUAL "Xcode")
 			set(CMAKE_XCODE_ATTRIBUTE_CC ${DISTCC_CC})
 			set(CMAKE_XCODE_ATTRIBUTE_CXX ${DISTCC_CXX})
+			# Disable the indexing feature in Xcode's build settings to prevent
+			# issues with distcc. The `-index-store-path` compiler flag causes
+			# problems with distcc's distributed compilation process.
+			set(CMAKE_XCODE_ATTRIBUTE_COMPILER_INDEX_STORE_ENABLE NO)
 		elseif (CMAKE_GENERATOR STREQUAL "Unix Makefiles")
 			set(CMAKE_C_COMPILER_LAUNCHER ${DISTCC_CC})
 			set(CMAKE_CXX_COMPILER_LAUNCHER ${DISTCC_CXX})
